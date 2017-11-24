@@ -1,0 +1,82 @@
+---
+layout: post
+title:  "CS231n: SVM Loss Computation"
+date:   2017-11-23
+categories: note
+---
+# Value of Loss
+
+Let $$l$$ be the loss, $$r$$ be the regularization strength, $$S = X \cdot W$$:
+
+
+$$
+\begin{split}
+S_{i,j} &= X_{i, 1} W_{1, j} + X_{i, 1} W_{1, j} + ... + X_{i, D}W_{D, j} \\
+L_{i,j} &= \begin{cases}
+\max\{0, S_{i,j} - S_{i,y[i]}+1\}, j \neq y[i] \\
+0,j = y[i]
+\end{cases}\\
+l &= \sum_{i, j}L_{i,j}/N +r\sum_{i, j}W_{i,j}W_{i,j}
+\end{split}
+$$
+
+
+Code:
+
+```python
+N = X.shape[0]
+S = np.dot(X, W)
+L = S - S[np.arange(N), y].reshape(N, 1) + 1
+L[L < 0] = 0
+L[np.arange(N), y] = 0
+loss = np.sum(L)/N  + reg * np.sum(np.square(W))
+```
+
+# Gradient of Loss
+
+Consider the derivative of $$W_{m, n}$$:
+
+
+$$
+l'= \sum_{i, j}L'_{i,j}/N +2rW_{m,n}
+$$
+
+
+Since $$W_{m, n}$$ only appears in $$S_{i,n}$$,  only $$L'_{i,n}$$ and $$L'_{i, j \neq n}$$ will not be 0. Then, 
+
+
+$$
+\begin{split}
+L'_{i,n} &= \begin{cases}
+S'_{i, n},  &S_{i,n} - S_{i,y[i]}+1 > 0, y[i] \neq n \\
+0, &\text{otherwise}
+\end{cases} \\
+L'_{i,j \neq n} &= \begin{cases}
+-S'_{i, n}, &S_{i,j} - S_{i,n}+1 > 0, y[i] = n \\
+0, &\text{otherwise}
+\end{cases} \\
+S'_{i, n} &= X_{i,m}
+\end{split}
+$$
+
+
+That is, 
+
+
+$$
+l'=(\sum_{i}((L_{i, n}>0 \cap y[i] \neq n)X_{i,m})-(y[i]=n)X_{i,m}\sum_{j\neq n}(L_{i,n} > 0))/N +2rW_{m,n}
+$$
+
+
+Code:
+
+```python
+N = X.shape[0]
+C = W.shape[1]
+LI = (L > 0).astype("int")
+LI[np.arange(N), y] = -np.sum(LI, axis=1)
+dW = np.dot(X.T, LI) /N + 2 * reg *W
+```
+
+
+
