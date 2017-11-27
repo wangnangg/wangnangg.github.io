@@ -103,14 +103,19 @@ l &= -\sum_{i}\log(L_{i,y[i]})/N +r\sum_{i, j}W_{i,j}W_{i,j}
 
 <h1 id="gradient-of-loss">Gradient of Loss</h1>
 
-<p>Consider the derivative of <script type="math/tex">W_{m, n}</script>:
-<script type="math/tex">l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}</script>
-If <script type="math/tex">y[i] \neq n</script>:
-<script type="math/tex">\begin{split}
+<p>Consider the derivative of <script type="math/tex">W_{m, n}</script>:</p>
+
+<script type="math/tex; mode=display">l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}</script>
+
+<p>If <script type="math/tex">y[i] \neq n</script>:</p>
+
+<script type="math/tex; mode=display">\begin{split}
 L'_{i, y[i]} = -\frac{e^{S_{i,y[i]}} e^{S_{i,n}}X_{i,m}}{(\sum_ke^{S_{i,k}})^2} = -L^2_{i, y[i]}e^{S_{i,n}-S_{i, y[i]}}X_{i,m}
 \end{split}</script>
-If <script type="math/tex">y[i] = n</script>:
-<script type="math/tex">L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}</script></p>
+
+<p>If <script type="math/tex">y[i] = n</script>:</p>
+
+<script type="math/tex; mode=display">L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}</script>
 
 <p>Code:</p>
 

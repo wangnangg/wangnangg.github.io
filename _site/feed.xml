@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2017-11-27T18:51:08-05:00</updated><id>/</id><title type="html">Nan Wang’s Home</title><subtitle>place for my notes</subtitle><entry><title type="html">CS231n: Softmax Loss Computation</title><link href="/note/2017/11/27/softmax-loss.html" rel="alternate" type="text/html" title="CS231n: Softmax Loss Computation" /><published>2017-11-27T00:00:00-05:00</published><updated>2017-11-27T00:00:00-05:00</updated><id>/note/2017/11/27/softmax-loss</id><content type="html" xml:base="/note/2017/11/27/softmax-loss.html">&lt;h1 id=&quot;value-of-loss&quot;&gt;Value of Loss&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2017-11-27T18:53:01-05:00</updated><id>/</id><title type="html">Nan Wang’s Home</title><subtitle>place for my notes</subtitle><entry><title type="html">CS231n: Softmax Loss Computation</title><link href="/note/2017/11/27/softmax-loss.html" rel="alternate" type="text/html" title="CS231n: Softmax Loss Computation" /><published>2017-11-27T00:00:00-05:00</published><updated>2017-11-27T00:00:00-05:00</updated><id>/note/2017/11/27/softmax-loss</id><content type="html" xml:base="/note/2017/11/27/softmax-loss.html">&lt;h1 id=&quot;value-of-loss&quot;&gt;Value of Loss&lt;/h1&gt;
 
 &lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;l&lt;/script&gt; be the loss, &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; be the regularization strength, &lt;script type=&quot;math/tex&quot;&gt;S = X \cdot W&lt;/script&gt;:&lt;/p&gt;
 
@@ -21,14 +21,19 @@ l &amp;= -\sum_{i}\log(L_{i,y[i]})/N +r\sum_{i, j}W_{i,j}W_{i,j}
 
 &lt;h1 id=&quot;gradient-of-loss&quot;&gt;Gradient of Loss&lt;/h1&gt;
 
-&lt;p&gt;Consider the derivative of &lt;script type=&quot;math/tex&quot;&gt;W_{m, n}&lt;/script&gt;:
-&lt;script type=&quot;math/tex&quot;&gt;l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}&lt;/script&gt;
-If &lt;script type=&quot;math/tex&quot;&gt;y[i] \neq n&lt;/script&gt;:
-&lt;script type=&quot;math/tex&quot;&gt;\begin{split}
+&lt;p&gt;Consider the derivative of &lt;script type=&quot;math/tex&quot;&gt;W_{m, n}&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}&lt;/script&gt;
+
+&lt;p&gt;If &lt;script type=&quot;math/tex&quot;&gt;y[i] \neq n&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{split}
 L'_{i, y[i]} = -\frac{e^{S_{i,y[i]}} e^{S_{i,n}}X_{i,m}}{(\sum_ke^{S_{i,k}})^2} = -L^2_{i, y[i]}e^{S_{i,n}-S_{i, y[i]}}X_{i,m}
 \end{split}&lt;/script&gt;
-If &lt;script type=&quot;math/tex&quot;&gt;y[i] = n&lt;/script&gt;:
-&lt;script type=&quot;math/tex&quot;&gt;L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;If &lt;script type=&quot;math/tex&quot;&gt;y[i] = n&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}&lt;/script&gt;
 
 &lt;p&gt;Code:&lt;/p&gt;
 

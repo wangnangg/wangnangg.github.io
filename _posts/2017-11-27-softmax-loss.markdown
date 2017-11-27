@@ -33,16 +33,26 @@ loss = -np.mean(np.log(L[np.arange(N), y])) + reg *np.sum(W * W)
 # Gradient of Loss
 
 Consider the derivative of $$W_{m, n}$$:
+
+
 $$
 l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}
 $$
+
+
 If $$y[i] \neq n$$:
+
+
 $$
 \begin{split}
 L'_{i, y[i]} = -\frac{e^{S_{i,y[i]}} e^{S_{i,n}}X_{i,m}}{(\sum_ke^{S_{i,k}})^2} = -L^2_{i, y[i]}e^{S_{i,n}-S_{i, y[i]}}X_{i,m}
 \end{split}
 $$
+
+
 If $$y[i] = n$$:
+
+
 $$
 L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}
 $$
