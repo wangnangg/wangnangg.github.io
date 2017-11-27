@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Nan Wang&#39;s Home</title>
-  <meta name="description" content="place for my notes">
+  <title>CS231n: Softmax Loss Computation</title>
+  <meta name="description" content="Let be the loss, be the regularization strength, :">
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="/">
+  <link rel="canonical" href="/note/2017/11/27/softmax-loss.html">
   <link rel="alternate" type="application/rss+xml" title="Nan Wang&#39;s Home" href="/feed.xml">
   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>  
   
@@ -67,38 +67,42 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <h1 class="page-heading">Posts</h1>
-  
-  
-
-
-  <ul class="post-list">
-    
-      <li>
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">CS231n: Softmax Loss Computation</h1>
+    <p class="post-meta">
+      <time datetime="2017-11-27T00:00:00-05:00" itemprop="datePublished">
         
-        <span class="post-meta">Nov 27, 2017</span>
+        Nov 27, 2017
+      </time>
+      </p>
+  </header>
 
-        <h2>
-          <a class="post-link" href="/note/2017/11/27/softmax-loss.html">CS231n: Softmax Loss Computation</a>
-        </h2>
-      </li>
-    
-      <li>
-        
-        <span class="post-meta">Nov 23, 2017</span>
+  <div class="post-content" itemprop="articleBody">
+    <p>Let <script type="math/tex">l</script> be the loss, <script type="math/tex">r</script> be the regularization strength, <script type="math/tex">S = X \cdot W</script>:</p>
 
-        <h2>
-          <a class="post-link" href="/note/2017/11/23/svm-loss.html">CS231n: SVM Loss Computation</a>
-        </h2>
-      </li>
-    
-  </ul>
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{split}
+S_{i,j} &= X_{i, 1} W_{1, j} + X_{i, 1} W_{1, j} + ... + X_{i, D}W_{D, j} \\
+L_{i,j} &= \frac{e^{S_{i,j}}}{\sum_k e^{S_{i,k}}} = \frac{e^{S_{i,j} - \max \{S_{i,k}\} }}{\sum_k e^{S_{i,k}- \max \{S_{i,k}\} }} \\
+l &= -\sum_{i}\log(L_{i,y[i]})/N +r\sum_{i, j}W_{i,j}W_{i,j}
+\end{split} %]]></script>
 
-  <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
+<p>Code:</p>
 
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">N</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+<span class="n">Sm</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Sm</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]))</span> <span class="o">+</span> <span class="n">reg</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span>
+</code></pre></div></div>
+
+
+  </div>
+
+  
+</article>
 
       </div>
     </main>
