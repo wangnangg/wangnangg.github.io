@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>CS231n: Softmax Loss Computation</title>
-  <meta name="description" content="Let be the loss, be the regularization strength, :">
+  <meta name="description" content="Value of Loss">
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="/note/2017/11/27/softmax-loss.html">
@@ -80,11 +80,13 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>Let <script type="math/tex">l</script> be the loss, <script type="math/tex">r</script> be the regularization strength, <script type="math/tex">S = X \cdot W</script>:</p>
+    <h1 id="value-of-loss">Value of Loss</h1>
+
+<p>Let <script type="math/tex">l</script> be the loss, <script type="math/tex">r</script> be the regularization strength, <script type="math/tex">S = X \cdot W</script>:</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{split}
-S_{i,j} &= X_{i, 1} W_{1, j} + X_{i, 1} W_{1, j} + ... + X_{i, D}W_{D, j} \\
+S_{i,j} &= X_{i, 1} W_{1, j} + X_{i, 2} W_{2, j} + ... + X_{i, D}W_{D, j} \\
 L_{i,j} &= \frac{e^{S_{i,j}}}{\sum_k e^{S_{i,k}}} = \frac{e^{S_{i,j} - \max \{S_{i,k}\} }}{\sum_k e^{S_{i,k}- \max \{S_{i,k}\} }} \\
 l &= -\sum_{i}\log(L_{i,y[i]})/N +r\sum_{i, j}W_{i,j}W_{i,j}
 \end{split} %]]></script>
@@ -93,9 +95,31 @@ l &= -\sum_{i}\log(L_{i,y[i]})/N +r\sum_{i, j}W_{i,j}W_{i,j}
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">N</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
-<span class="n">Sm</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Sm</span> <span class="o">=</span><span class="n">S</span> <span class="o">-</span>  <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Sm</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]))</span> <span class="o">+</span> <span class="n">reg</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="gradient-of-loss">Gradient of Loss</h1>
+
+<p>Consider the derivative of <script type="math/tex">W_{m, n}</script>:
+<script type="math/tex">l'= -\sum_{i}\frac{1}{L_{i, y[i]}}L'_{i,y[i]}/N +2rW_{m,n}</script>
+If <script type="math/tex">y[i] \neq n</script>:
+<script type="math/tex">\begin{split}
+L'_{i, y[i]} = -\frac{e^{S_{i,y[i]}} e^{S_{i,n}}X_{i,m}}{(\sum_ke^{S_{i,k}})^2} = -L^2_{i, y[i]}e^{S_{i,n}-S_{i, y[i]}}X_{i,m}
+\end{split}</script>
+If <script type="math/tex">y[i] = n</script>:
+<script type="math/tex">L'_{i, y[i]} = L_{i,n}X_{i,m} - L^2_{i, n}X_{i,m} = (L_{i, n} - L^2_{i,n})X_{i,m}</script></p>
+
+<p>Code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">N</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Se</span> <span class="o">=</span> <span class="n">S</span> <span class="o">-</span> <span class="n">S</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Le</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Se</span><span class="p">)</span>
+<span class="n">Le</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">])</span>
+<span class="n">Le</span> <span class="o">/=</span> <span class="o">-</span><span class="n">L</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">dW</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Le</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">W</span>
 </code></pre></div></div>
 
 
